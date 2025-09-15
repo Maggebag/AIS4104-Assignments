@@ -112,6 +112,7 @@ Eigen::Matrix4d transformation_matrix(const Eigen::Matrix3d &r, const Eigen::Vec
     return transformation_matrix;
 }
 
+// Do not need to do translation since it is not in point space
 void transform_vector() {
     const Eigen::Vector3d v_a (2.5, 3.0, -10.0);
     const Eigen::Vector3d Eigen_Rotations(60.0, 45.0, 0.0);
