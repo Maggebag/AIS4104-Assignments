@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
-  "name": "test",
+  "name": "test-assignment-1",
   "dependencies": [
     "eigen3"
   ],
@@ -13,3 +13,4 @@
     }
   }
 }
+

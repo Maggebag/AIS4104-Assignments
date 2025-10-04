@@ -3,4 +3,5 @@ project(AIS4104-assignment-n)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_subdirectory(Assignement-1)
+add_subdirectory(Assignment-1)
+add_subdirectory(Assignment-2)

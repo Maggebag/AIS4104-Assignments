@@ -94,6 +94,7 @@ Eigen::Matrix3d rotation_matrix_from_axis_angle(const Eigen::Vector3d &axis, dou
     return Eigen::Matrix3d::Identity() + s * W + (1-c) * (W*W);
 }
 
+// Euler rotation is just a way of creating a rotation matrix with a set order.
 Eigen::Matrix3d rotation_matrix_from_euler_zyx(const Eigen::Vector3d &e){
         const double rot_x = e[2];
         const double rot_y = e[1];
@@ -112,7 +113,7 @@ Eigen::Matrix4d transformation_matrix(const Eigen::Matrix3d &r, const Eigen::Vec
     return transformation_matrix;
 }
 
-// Do not need to do translation since it is not in point space
+// Do not need to do translation since it is not a point in space but a free vector
 void transform_vector() {
     const Eigen::Vector3d v_a (2.5, 3.0, -10.0);
     const Eigen::Vector3d Eigen_Rotations(60.0, 45.0, 0.0);
