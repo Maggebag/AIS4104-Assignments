@@ -1,12 +1,10 @@
 
-#ifndef AIS4104_ASSIGNMENT_N_ASSIGNMENT_2_HPP
-#define AIS4104_ASSIGNMENT_N_ASSIGNMENT_2_HPP
-
-#endif //AIS4104_ASSIGNMENT_N_ASSIGNMENT_2_HPP
+#pragma omp parallel for
 
 #include <Eigen/Dense>
 
 namespace robotics2 {
+    inline bool float_equals(double a, double b, double epsilon = 1e-6);
 
     Eigen::Vector3d euler_zyx_from_rotation_matrix(const Eigen::Matrix3d &r);
 
@@ -49,6 +47,5 @@ namespace robotics2 {
     void test_ur3_fk_screw();
 
     void test_ur3_fk_transform();
-
 
 }

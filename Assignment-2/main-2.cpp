@@ -12,7 +12,7 @@ void test_Euler_zyx()
     constexpr double roll = std::numbers::pi / 8;
 
     // Why did I make it take degrees input, in hindsight makes it really annoying to work with
-    const Eigen::Vector3d euler_zyx_deg(robotics1::rad_to_deg(yaw), robotics1::rad_to_deg(pitch), robotics1::rad_to_deg(roll));
+    const Eigen::Vector3d euler_zyx_deg(robotics1::rad_to_deg*yaw, robotics1::rad_to_deg*pitch, robotics1::rad_to_deg*roll);
 
     const Eigen::Matrix3d R = robotics1::rotation_matrix_from_euler_zyx(euler_zyx_deg);
 

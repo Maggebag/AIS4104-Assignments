@@ -5,16 +5,34 @@
 #include "Assignment-1.hpp"
 
 namespace robotics2 {
+    bool float_equals(const double a, const double b, const double epsilon)
+    {
+        return std::abs(a-b) < epsilon;
+    }
     /* ----------------          Task 1           ---------------- */
 
     // Equations from MR-preprint 2019 Appendix B chapter B.1.1
     Eigen::Vector3d euler_zyx_from_rotation_matrix(const Eigen::Matrix3d &r)
     {
         Eigen::Vector3d euler_zyx; // Init the vector for returning the rotations
+        double alpha,beta,gamma;
+        const double r31 = std::clamp(r(2,0), -1.0, 1.0); // Clamp to avoid domain issues from numerical drift
 
-        double alpha = atan2(r(1, 0), r(0, 0));
-        double beta = atan2(-r(2,0), sqrt(std::pow(r(0,0),2) + std::pow(r(1,0),2)));
-        double gamma = atan2(r(2,1), r(2,2));
+        if (!float_equals(r31, -1.0) && !float_equals(r31, 1.0)) {
+            alpha = std::atan2(r(1, 0), r(0, 0));
+            beta = std::atan2(-r31, std::hypot(r(0,0), r(1,0))); // Switched to using hypot instead of manually solving the root and square
+            gamma = std::atan2(r(2,1), r(2,2));
+        }
+        else if (float_equals(r31, -1.0)) {
+            alpha = 0.0;
+            beta = std::numbers::pi / 2;
+            gamma = std::atan2(r(0,1), r(1,1));
+        }
+        else if (float_equals(r31, 1.0)) {
+            alpha = 0.0;
+            beta = -std::numbers::pi / 2;
+            gamma = -std::atan2(r(0,1), r(1,1));
+        }
 
         euler_zyx << alpha, beta, gamma;
 
@@ -67,8 +85,8 @@ namespace robotics2 {
     // Equation 3.51 page 82, MR pre-print 2019
     Eigen::Matrix3d matrix_exponential(const Eigen::Vector3d &w, double theta)
     {
-        double rad = robotics1::deg_to_rad(theta);
-        Eigen::Matrix3d R = Eigen::Matrix3d::Identity() + sin(rad) * robotics1::skew_symmetric(w) + (1-cos(rad)) * robotics1::skew_symmetric(w) * robotics1::skew_symmetric(w);
+        double rad = robotics1::deg_to_rad*theta;
+        Eigen::Matrix3d R = Eigen::Matrix3d::Identity() + std::sin(rad) * robotics1::skew_symmetric(w) + (1-std::cos(rad)) * robotics1::skew_symmetric(w) * robotics1::skew_symmetric(w);
         return R;
     }
 
@@ -78,18 +96,18 @@ namespace robotics2 {
         double theta;
         Eigen::Vector3d w;
 
-        if (r == Eigen::Matrix3d::Identity()) {
+        if (r.isApprox(Eigen::Matrix3d::Identity())) {
             theta = 0;
         }
         else {
             double trace_r = r.trace(); // Built-in eigen function for trace
-            if (trace_r == -1) {
+            if (float_equals(trace_r, -1)) {
                 theta = std::numbers::pi;
                 w = (1 / sqrt(2 * (1 + r(2,2)))) * Eigen::Vector3d (r(0,2), r(1,2), 1 + r(2,2));
             }
             else {
-                theta = acos(0.5 * (trace_r - 1));
-                double w_n = 1 / 2*sin(theta);
+                theta = std::acos(0.5 * (trace_r - 1));
+                double w_n = 1.0 / 2.0 * std::sin(theta);
 
                 double w_1 = w_n * (r(2, 1) - r(1, 2));
                 double w_2 = w_n * (r(0, 2) - r(2, 0));
@@ -105,10 +123,10 @@ namespace robotics2 {
     // Preposition 3.25 on page 103, MR pre-print 2019
     Eigen::Matrix4d matrix_exponential(const Eigen::Vector3d &w, const Eigen::Vector3d &v, double theta)
     {
-        double rad = robotics1::deg_to_rad(theta);
+        double rad = robotics1::deg_to_rad*theta;
 
         Eigen::Matrix3d R = matrix_exponential(w, theta);
-        Eigen::Vector3d v_theta = ((Eigen::Matrix3d::Identity() * rad) + ((1-cos(rad)) * robotics1::skew_symmetric(w)) + (rad - sin(rad)) * robotics1::skew_symmetric(w) * robotics1::skew_symmetric(w)) * v;
+        Eigen::Vector3d v_theta = ((Eigen::Matrix3d::Identity() * rad) + ((1-std::cos(rad)) * robotics1::skew_symmetric(w)) + (rad - std::sin(rad)) * robotics1::skew_symmetric(w) * robotics1::skew_symmetric(w)) * v;
 
         Eigen::Matrix4d T = robotics1::transformation_matrix(R, v_theta);
         return T;
@@ -124,7 +142,7 @@ namespace robotics2 {
         Eigen::Vector3d v;
         double theta;
 
-        if (R == Eigen::Matrix3d::Identity()) {
+        if (R.isApprox(Eigen::Matrix3d::Identity())) {
             w = Eigen::Vector3d::Zero();
             v = p / p.norm();
             theta = p.norm();
@@ -155,7 +173,7 @@ namespace robotics2 {
         Eigen::Vector3d e_ws(60, -60, 0);
 
         // Rotation from sensor to world
-        Eigen::Matrix3d R_ws = robotics2::rotation_matrix_from_euler_yzx(e_ws);
+        Eigen::Matrix3d R_ws = rotation_matrix_from_euler_yzx(e_ws);
 
         Eigen::Vector3d m_w = R_ws * m_s;
 
@@ -182,8 +200,8 @@ namespace robotics2 {
         Eigen::Vector3d w_a (0, 0, 0);
         Eigen::Vector3d f_a (0, 0, g*m_apple);
 
-        Eigen::VectorXd F_h = robotics2::twist(w_h, f_h);
-        Eigen::VectorXd F_a = robotics2::twist(w_a, f_a);
+        Eigen::VectorXd F_h = twist(w_h, f_h);
+        Eigen::VectorXd F_a = twist(w_a, f_a);
 
         Eigen::Matrix3d R_h = Eigen::Matrix3d::Identity();
         Eigen::Matrix3d R_a;
@@ -197,8 +215,8 @@ namespace robotics2 {
         Eigen::Matrix4d T_hf = robotics1::transformation_matrix(R_h, p_h);
         Eigen::Matrix4d T_af = robotics1::transformation_matrix(R_a, p_a);
 
-        Eigen::MatrixXd Adj_hf = robotics2::adjoint_matrix(T_hf);
-        Eigen::MatrixXd Adj_af = robotics2::adjoint_matrix(T_af);
+        Eigen::MatrixXd Adj_hf = adjoint_matrix(T_hf);
+        Eigen::MatrixXd Adj_af = adjoint_matrix(T_af);
 
         Eigen::VectorXd F_f = Adj_hf.transpose() * F_h + Adj_af.transpose()*F_a;
 
@@ -236,9 +254,9 @@ namespace robotics2 {
         Eigen::Matrix4d M = Eigen::Matrix4d::Identity();
         M(0,3) = L1+L2+L3;
 
-        Eigen::Matrix4d e_1 = robotics2::matrix_exponential(w1, v1, joint_positions[0]);
-        Eigen::Matrix4d e_2 = robotics2::matrix_exponential(w2, v2, joint_positions[1]);
-        Eigen::Matrix4d e_3 = robotics2::matrix_exponential(w3, v3, joint_positions[2]);
+        Eigen::Matrix4d e_1 = matrix_exponential(w1, v1, joint_positions[0]);
+        Eigen::Matrix4d e_2 = matrix_exponential(w2, v2, joint_positions[1]);
+        Eigen::Matrix4d e_3 = matrix_exponential(w3, v3, joint_positions[2]);
 
         return e_1 * e_2 * e_3 * M;
     }
@@ -255,7 +273,7 @@ namespace robotics2 {
         std::cout << "Planar 3r transform: \n" << std::endl;
         for (int i = 0; i < joint_positions.size(); ++i ) {
             Eigen::Matrix4d T = planar_3r_fk_transform(joint_positions[i]);
-            robotics2::print_pose("T", T);
+            print_pose("T", T);
         }
     }
 
@@ -271,7 +289,7 @@ namespace robotics2 {
         std::cout << "Planar 3r transform using POE: \n" << std::endl;
         for (int i = 0; i < joint_positions.size(); ++i ) {
             Eigen::Matrix4d T = planar_3r_fk_screw(joint_positions[i]);
-            robotics2::print_pose("T", T);
+            print_pose("T", T);
         }
     }
 
@@ -305,12 +323,12 @@ namespace robotics2 {
                                 {0, 1, 0, H1 - H2 },
                                 {0, 0, 0, 1 }};
 
-        Eigen::Matrix4d e_1 = robotics2::matrix_exponential(w1, v1, joint_positions[0]);
-        Eigen::Matrix4d e_2 = robotics2::matrix_exponential(w2, v2, joint_positions[1]);
-        Eigen::Matrix4d e_3 = robotics2::matrix_exponential(w3, v3, joint_positions[2]);
-        Eigen::Matrix4d e_4 = robotics2::matrix_exponential(w4, v4, joint_positions[3]);
-        Eigen::Matrix4d e_5 = robotics2::matrix_exponential(w5, v5, joint_positions[4]);
-        Eigen::Matrix4d e_6 = robotics2::matrix_exponential(w6, v6, joint_positions[5]);
+        Eigen::Matrix4d e_1 = matrix_exponential(w1, v1, joint_positions[0]);
+        Eigen::Matrix4d e_2 = matrix_exponential(w2, v2, joint_positions[1]);
+        Eigen::Matrix4d e_3 = matrix_exponential(w3, v3, joint_positions[2]);
+        Eigen::Matrix4d e_4 = matrix_exponential(w4, v4, joint_positions[3]);
+        Eigen::Matrix4d e_5 = matrix_exponential(w5, v5, joint_positions[4]);
+        Eigen::Matrix4d e_6 = matrix_exponential(w6, v6, joint_positions[5]);
 
         return e_1 * e_2 * e_3 * e_4  * e_5 * e_6 * M;
     }
@@ -324,12 +342,12 @@ namespace robotics2 {
         double H1 = 0.1518;
         double H2 = 0.08535;
 
-        const double q1 = robotics1::deg_to_rad(joint_positions[0]);
-        const double q2 = robotics1::deg_to_rad(joint_positions[1]);
-        const double q3 = robotics1::deg_to_rad(joint_positions[2]);
-        const double q4 = robotics1::deg_to_rad(joint_positions[3]);
-        const double q5 = robotics1::deg_to_rad(joint_positions[4]);
-        const double q6 = robotics1::deg_to_rad(joint_positions[5]);
+        const double q1 = robotics1::deg_to_rad*joint_positions[0];
+        const double q2 = robotics1::deg_to_rad*joint_positions[1];
+        const double q3 = robotics1::deg_to_rad*joint_positions[2];
+        const double q4 = robotics1::deg_to_rad*joint_positions[3];
+        const double q5 = robotics1::deg_to_rad*joint_positions[4];
+        const double q6 = robotics1::deg_to_rad*joint_positions[5];
 
         // Can create transformation matrices directly from DH table
         // Had this function from an assignment from the bachelor studies
@@ -366,7 +384,7 @@ namespace robotics2 {
         std::cout << "UR3e FK using POE:\n\n";
         for (int i = 0; i < joint_configurations.size(); i++) {
             Eigen::Matrix4d T = ur3e_fk_screw(joint_configurations[i]);
-            robotics2::print_pose("T", T);
+            print_pose("T", T);
         }
     }
 
@@ -381,7 +399,7 @@ namespace robotics2 {
         std::cout << "UR3e FK using Homogenous Transformation:\n\n";
         for (int i = 0; i < joint_configurations.size(); i++) {
             Eigen::Matrix4d T = ur3e_fk_transform(joint_configurations[i]);
-            robotics2::print_pose("T", T);
+            print_pose("T", T);
         }
     }
 } // namespace end

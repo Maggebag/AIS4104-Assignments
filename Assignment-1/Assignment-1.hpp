@@ -1,15 +1,13 @@
 
-#ifndef AIS4104_ASSIGNMENT_N_ASSIGNMENT_1_HPP
-#define AIS4104_ASSIGNMENT_N_ASSIGNMENT_1_HPP
-
-#endif //AIS4104_ASSIGNMENT_N_ASSIGNMENT_1_HPP
+#pragma once
 
 #include <Eigen/Dense>
+#include <numbers>
 
 namespace robotics1 {
 
-    double deg_to_rad(double degrees);
-    double rad_to_deg(double radians);
+    constexpr double deg_to_rad = std::numbers::pi / 180.0;
+    constexpr double rad_to_deg = 180.0 / std::numbers::pi;
 
     Eigen::Matrix3d skew_symmetric(const Eigen::Vector3d& vec);
 
