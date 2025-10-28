@@ -1,5 +1,5 @@
 
-#pragma omp parallel for
+#pragma once
 
 #include <Eigen/Dense>
 
