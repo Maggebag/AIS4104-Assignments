@@ -81,12 +81,12 @@ void ur3e_test_jacobian()
     ur3e_test_jacobian(robotics3::std_vector_to_eigen(std::vector<double>{45.0, -20.0, 10.0, 2.5, 30.0, -50.0}) *
     robotics1::deg_to_rad);
     }
-/*
+
 void ur3e_ik_test_pose(const Eigen::Vector3d &pos, const Eigen::Vector3d &zyx, const Eigen::VectorXd
 &j0)
 {
     std::cout << "Test from pose" << std::endl;
-    Eigen::Matrix4d t_sd = robotics1::transformation_matrix(robotics1::rotation_matrix_from_euler_zyx(zyx), pos);
+    Eigen::Matrix4d t_sd = robotics1::transformation_matrix(robotics1::rotation_matrix_from_euler_zyx(zyx * robotics1::rad_to_deg), pos);
     auto [iterations, j_ik] = robotics3::ur3e_ik_body(t_sd, j0);
     Eigen::Matrix4d t_ik = robotics3::ur3e_body_fk(j_ik);
     robotics2::print_pose(" IK pose", t_ik);
@@ -112,22 +112,26 @@ void ur3e_ik_test_configuration(const Eigen::VectorXd &joint_positions, const Ei
 
 void ur3e_ik_test()
 {
+    std::cout << "----------------------------------------" << std::endl;
     Eigen::VectorXd j_t0 = robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) *
     robotics1::deg_to_rad;
     Eigen::VectorXd j_t1 = robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, -89.0, 0.0, 0.0, 0.0}) *
     robotics1::deg_to_rad;
     ur3e_ik_test_pose(Eigen::Vector3d{0.3289, 0.22315, 0.36505}, Eigen::Vector3d{0.0, 90.0, -90.0} *
     robotics1::deg_to_rad, j_t0);
+    std::cout << "----------------------------------------" << std::endl;
     ur3e_ik_test_pose(Eigen::Vector3d{0.3289, 0.22315, 0.36505}, Eigen::Vector3d{0.0, 90.0, -90.0} *
     robotics1::deg_to_rad, j_t1);
+    std::cout << "----------------------------------------" << std::endl;
     Eigen::VectorXd j_t2 = robotics3::std_vector_to_eigen(std::vector<double>{50.0, -30.0, 20, 0.0, -30.0, 50.0})
     * robotics1::deg_to_rad;
     Eigen::VectorXd j_d1 = robotics3::std_vector_to_eigen(std::vector<double>{45.0, -20.0, 10.0, 2.5, 30.0,
     -50.0}) * robotics1::deg_to_rad;
     ur3e_ik_test_configuration(j_d1, j_t0);
+    std::cout << "----------------------------------------" << std::endl;
     ur3e_ik_test_configuration(j_d1, j_t2);
 }
-*/
+
 int main()
 {
     ur3e_test_fk();
@@ -136,5 +140,6 @@ int main()
     // Gradient descent does not find the roots, because it is designed to minimize the
     // function value (i.e., solve f'(x) = 0) rather than find where f(x) = 0.
     ur3e_test_jacobian();
+    ur3e_ik_test();
     return 0;
 }

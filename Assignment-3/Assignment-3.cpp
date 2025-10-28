@@ -229,10 +229,47 @@ namespace robotics3 {
         return J;
     }
 
+    // Numerical IK in body frame (Section 6.2.2, MR preprint 2019) Mainly page 228-229
     std::pair<size_t, Eigen::VectorXd> ur3e_ik_body(const Eigen::Matrix4d &t_sd, const Eigen::VectorXd
     &current_joint_positions, double gamma, double v_e, double w_e)
     {
+        constexpr size_t max_iter = 10000;
+        size_t iter = 0;
 
+        // Initial Guess from current joint positions
+        Eigen::VectorXd thetas = current_joint_positions;
+
+        for (; iter < max_iter; ++iter) {
+            // Compute current end-effector position
+            Eigen::Matrix4d T_sb = ur3e_body_fk(thetas);
+
+            // Find pose error twist
+            auto T_err = (T_sb.inverse() * t_sd).eval();
+            auto [Vb, _] = robotics2::matrix_logarithm(T_err);
+
+            Eigen::Vector3d wb = Vb.head<3>();
+            Eigen::Vector3d vb = Vb.tail<3>();
+
+            // Stop if both rotational and positional errors small enough
+            if (wb.norm() < w_e && vb.norm() < v_e)
+                break;
+
+            // Compute Jacobian in body frame
+            Eigen::MatrixXd Jb = ur3e_body_jacobian(thetas);
+
+            double lambda = 1e-4; // damping term
+            Eigen::MatrixXd I6 = Eigen::MatrixXd::Identity(6,6);
+            Eigen::MatrixXd Jb_pinv =
+                Jb.transpose() * (Jb * Jb.transpose() + lambda * lambda * I6).inverse();
+
+            // Update step
+            thetas = thetas + gamma * (Jb_pinv * Vb);
+            // Keep angles between -pi and pi
+            for(int k = 0; k < thetas.size(); k++) thetas[k] = std::atan2(std::sin(thetas[k]), std::cos(thetas[k]));
+
+        }
+
+        return {iter, thetas};
     }
 
 }
