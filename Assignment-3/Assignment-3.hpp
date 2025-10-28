@@ -2,6 +2,8 @@
 #pragma once
 
 #include <Eigen/Dense>
+#include <functional>
+#include <numbers>
 
 namespace robotics3 {
 
@@ -29,6 +31,5 @@ namespace robotics3 {
 
     std::pair<size_t, Eigen::VectorXd> ur3e_ik_body(const Eigen::Matrix4d &t_sd, const Eigen::VectorXd
     &current_joint_positions, double gamma = 1e-2, double v_e = 4e-3, double w_e = 4e-3);
-
 
 }

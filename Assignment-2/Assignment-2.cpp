@@ -48,7 +48,7 @@ namespace robotics2 {
     }
 
     // Equation on page 101, MR pre-print 2019
-    Eigen::VectorXd screw_axis(const Eigen::Vector3d &q, const Eigen::Vector3d &s, double h)
+    Eigen::VectorXd screw_axis(const Eigen::Vector3d &q, const Eigen::Vector3d &s, const double h)
     {
         Eigen::Vector3d v = -s.cross(q) + h * s;
         Eigen::VectorXd axis(6);
@@ -163,7 +163,7 @@ namespace robotics2 {
         Eigen::Matrix3d R = tf.topLeftCorner<3,3>();
         Eigen::Vector3d p = tf.topRightCorner<3,1>();
         Eigen::Vector3d e_ZYX = euler_zyx_from_rotation_matrix(R);
-        std::cout << label << std::endl << "Pose: " << std::endl << "Euler ZYX: " << std::endl << e_ZYX << std::endl << "Position: " << p.transpose() << std::endl << std::endl;
+        std::cout << label << " Pose: " << std::endl << "Euler ZYX: " << e_ZYX.transpose() << std::endl << "Position: " << p.transpose() << std::endl << std::endl;
     }
 
     void task2_a()

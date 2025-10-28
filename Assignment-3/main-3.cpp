@@ -1,5 +1,4 @@
 #include <iostream>
-#include <numbers>
 
 #include "Assignment-3.hpp"
 #include "Assignment-2.hpp"
@@ -8,24 +7,24 @@
 void ur3e_test_fk()
 {
     std::cout << "Forward kinematics tests" << std::endl;
-    robotics2::print_pose("", robotics3::ur3e_space_fk(robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) *
+    robotics2::print_pose("Space-1", robotics3::ur3e_space_fk(robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) *
     robotics1::deg_to_rad));
-    robotics2::print_pose("", robotics3::ur3e_body_fk(robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) *
-    robotics1::deg_to_rad));
-    std::cout << std::endl;
-    robotics2::print_pose("", robotics3::ur3e_space_fk(robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, 0.0, -90.0, 0.0, 0.0}) *
-    robotics1::deg_to_rad));
-    robotics2::print_pose("", robotics3::ur3e_body_fk(robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, 0.0, -90.0, 0.0, 0.0}) *
+    robotics2::print_pose("Body-1", robotics3::ur3e_body_fk(robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) *
     robotics1::deg_to_rad));
     std::cout << std::endl;
-    robotics2::print_pose("", robotics3::ur3e_space_fk(robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, -180.0, 0.0, 0.0, 0.0}) *
+    robotics2::print_pose("Space-2", robotics3::ur3e_space_fk(robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, 0.0, -90.0, 0.0, 0.0}) *
     robotics1::deg_to_rad));
-    robotics2::print_pose("" ,robotics3::ur3e_body_fk(robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, -180.0, 0.0, 0.0, 0.0}) *
+    robotics2::print_pose("Body-2", robotics3::ur3e_body_fk(robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, 0.0, -90.0, 0.0, 0.0}) *
     robotics1::deg_to_rad));
     std::cout << std::endl;
-    robotics2::print_pose("", robotics3::ur3e_space_fk(robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, -90.0, 0.0, 0.0, 0.0}) *
+    robotics2::print_pose("Space-3", robotics3::ur3e_space_fk(robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, -180.0, 0.0, 0.0, 0.0}) *
     robotics1::deg_to_rad));
-    robotics2::print_pose("", robotics3::ur3e_body_fk(robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, -90.0, 0.0, 0.0, 0.0}) *
+    robotics2::print_pose("Body-3" ,robotics3::ur3e_body_fk(robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, -180.0, 0.0, 0.0, 0.0}) *
+    robotics1::deg_to_rad));
+    std::cout << std::endl;
+    robotics2::print_pose("Space-4", robotics3::ur3e_space_fk(robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, -90.0, 0.0, 0.0, 0.0}) *
+    robotics1::deg_to_rad));
+    robotics2::print_pose("Body-4", robotics3::ur3e_body_fk(robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, -90.0, 0.0, 0.0, 0.0}) *
     robotics1::deg_to_rad));
     };
 
@@ -52,6 +51,10 @@ void test_optimizations()
     };
     test_newton_raphson_root_find(f1, -20.0);
     test_gradient_descent_minimize(f1, -20.0);
+
+    // Run another test with a different starting point
+    test_newton_raphson_root_find(f1, 20.0);
+    test_gradient_descent_minimize(f1, 20.0);
 }
 
 void ur3e_test_jacobian(const Eigen::VectorXd &joint_positions)
@@ -78,7 +81,7 @@ void ur3e_test_jacobian()
     ur3e_test_jacobian(robotics3::std_vector_to_eigen(std::vector<double>{45.0, -20.0, 10.0, 2.5, 30.0, -50.0}) *
     robotics1::deg_to_rad);
     }
-
+/*
 void ur3e_ik_test_pose(const Eigen::Vector3d &pos, const Eigen::Vector3d &zyx, const Eigen::VectorXd
 &j0)
 {
@@ -123,4 +126,15 @@ void ur3e_ik_test()
     -50.0}) * robotics1::deg_to_rad;
     ur3e_ik_test_configuration(j_d1, j_t0);
     ur3e_ik_test_configuration(j_d1, j_t2);
+}
+*/
+int main()
+{
+    ur3e_test_fk();
+    test_optimizations();
+    // We find the correct roots of f(x) ≈ 0 at x = 2 and x = 4 using Newton–Raphson.
+    // Gradient descent does not find the roots, because it is designed to minimize the
+    // function value (i.e., solve f'(x) = 0) rather than find where f(x) = 0.
+    ur3e_test_jacobian();
+    return 0;
 }
