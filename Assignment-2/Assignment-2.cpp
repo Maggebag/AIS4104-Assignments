@@ -71,7 +71,7 @@ namespace robotics2 {
         return Adj;
     }
 
-    double cot(double x)
+    double cot(const double x)
     {
         return 1 / (std::sin(x) / std::cos(x)); // Use the known property that tan = sin/cos
     }
@@ -163,7 +163,7 @@ namespace robotics2 {
         Eigen::Matrix3d R = tf.topLeftCorner<3,3>();
         Eigen::Vector3d p = tf.topRightCorner<3,1>();
         Eigen::Vector3d e_ZYX = euler_zyx_from_rotation_matrix(R);
-        std::cout << "Pose: \n" << "Euler ZYX: \n" << e_ZYX << "\n" << "Position: " << p.transpose() << "\n" << std::endl;
+        std::cout << label << std::endl << "Pose: " << std::endl << "Euler ZYX: " << std::endl << e_ZYX << std::endl << "Position: " << p.transpose() << std::endl << std::endl;
     }
 
     void task2_a()
@@ -179,10 +179,10 @@ namespace robotics2 {
 
         Eigen::Vector3d f_s = R_ws.transpose() * f_w;
 
-        std::cout << "f_w: " << f_w.transpose() << "\n" << std::endl;
-        std::cout << "m_w: " << m_w.transpose() << "\n" << std::endl;
-        std::cout << "f_s: " << f_s.transpose() << "\n" << std::endl;
-        std::cout << "m_s: " << m_s.transpose() << "\n" << std::endl;
+        std::cout << "f_w: " << f_w.transpose() << std::endl << std::endl;
+        std::cout << "m_w: " << m_w.transpose() << std::endl << std::endl;
+        std::cout << "f_s: " << f_s.transpose() << std::endl << std::endl;
+        std::cout << "m_s: " << m_s.transpose() << std::endl << std::endl;
     }
 
     void task2_b()
@@ -220,7 +220,7 @@ namespace robotics2 {
 
         Eigen::VectorXd F_f = Adj_hf.transpose() * F_h + Adj_af.transpose()*F_a;
 
-        std::cout << "F_f: " << F_f.transpose() << "\n" << std::endl;
+        std::cout << "F_f: " << F_f.transpose() << std::endl << std::endl;
     }
 
     Eigen::Matrix4d planar_3r_fk_transform(const std::vector<double> &joint_positions)
@@ -270,10 +270,10 @@ namespace robotics2 {
             {  0.0,   0.0,  90.0 },   // j4
             { 10.0, -15.0,   2.75 }   // j5
         };
-        std::cout << "Planar 3r transform: \n" << std::endl;
+        std::cout << "Planar 3r transform: " << std::endl << std::endl;
         for (int i = 0; i < joint_positions.size(); ++i ) {
             Eigen::Matrix4d T = planar_3r_fk_transform(joint_positions[i]);
-            print_pose("T", T);
+            print_pose("T" + std::to_string(i), T);
         }
     }
 
@@ -286,10 +286,10 @@ namespace robotics2 {
             {  0.0,   0.0,  90.0 },   // j4
             { 10.0, -15.0,   2.75 }   // j5
         };
-        std::cout << "Planar 3r transform using POE: \n" << std::endl;
+        std::cout << "Planar 3r transform using POE: " << std::endl << std::endl;
         for (int i = 0; i < joint_positions.size(); ++i ) {
             Eigen::Matrix4d T = planar_3r_fk_screw(joint_positions[i]);
-            print_pose("T", T);
+            print_pose("T" + std::to_string(i), T);
         }
     }
 
@@ -384,7 +384,7 @@ namespace robotics2 {
         std::cout << "UR3e FK using POE:\n\n";
         for (int i = 0; i < joint_configurations.size(); i++) {
             Eigen::Matrix4d T = ur3e_fk_screw(joint_configurations[i]);
-            print_pose("T", T);
+            print_pose("T" + std::to_string(i), T);
         }
     }
 
@@ -399,7 +399,7 @@ namespace robotics2 {
         std::cout << "UR3e FK using Homogenous Transformation:\n\n";
         for (int i = 0; i < joint_configurations.size(); i++) {
             Eigen::Matrix4d T = ur3e_fk_transform(joint_configurations[i]);
-            print_pose("T", T);
+            print_pose("T" + std::to_string(i), T);
         }
     }
 } // namespace end
