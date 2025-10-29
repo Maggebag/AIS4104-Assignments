@@ -26,21 +26,21 @@ void ur3e_test_fk()
     robotics1::deg_to_rad));
     robotics2::print_pose("Body-4", robotics3::ur3e_body_fk(robotics3::std_vector_to_eigen(std::vector<double>{0.0, 0.0, -90.0, 0.0, 0.0, 0.0}) *
     robotics1::deg_to_rad));
-    };
+};
 
 void test_newton_raphson_root_find(const std::function<double(double)> &f, double x0)
 {
     auto [iterations, x_hat] = robotics3::newton_raphson_root_find(f, x0);
     std::cout << "NR root f, x0=" << x0 << " -> it=" << iterations << " x=" << x_hat << " f(x)=" <<
     f(x_hat) << std::endl;
-    }
+}
 
 void test_gradient_descent_minimize(const std::function<double(double)> &f, double x0)
 {
     auto [iterations, x_hat] = robotics3::gradient_descent_minimize(f, x0);
     std::cout << "GD root f, x0=" << x0 << " -> it=" << iterations << " x=" << x_hat << " f(x)=" <<
     f(x_hat) << std::endl;
-    }
+}
 
 void test_optimizations()
 {
@@ -80,7 +80,7 @@ void ur3e_test_jacobian()
     robotics1::deg_to_rad);
     ur3e_test_jacobian(robotics3::std_vector_to_eigen(std::vector<double>{45.0, -20.0, 10.0, 2.5, 30.0, -50.0}) *
     robotics1::deg_to_rad);
-    }
+}
 
 void ur3e_ik_test_pose(const Eigen::Vector3d &pos, const Eigen::Vector3d &zyx, const Eigen::VectorXd
 &j0)
@@ -141,5 +141,7 @@ int main()
     // function value (i.e., solve f'(x) = 0) rather than find where f(x) = 0.
     ur3e_test_jacobian();
     ur3e_ik_test();
+    // IK solver works well but does not necesarily lock on to the solution we want. For example for the pose testing it finds another correct pose that aquires the same TCP, but not necesarily the correct orientation. This could be solved with a bit more advanced code and some cost functions where we penalise large changes in orientation
+    // Also same goes for the test configuration. We find the correct pose and orientation but the jacobian is not exactly at the correct solution. We know that multiple joint configurations can realize the same TCP pose, and this is what we see an example of here.
     return 0;
 }

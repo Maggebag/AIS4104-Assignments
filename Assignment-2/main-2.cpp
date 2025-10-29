@@ -22,7 +22,7 @@ void test_Euler_zyx()
 
     Eigen::Vector3d euler_zyx_recovered = robotics2::euler_zyx_from_rotation_matrix(R);
 
-    std::cout << "Recovered ZYX: " << euler_zyx_recovered.transpose() << "\n" << std::endl;
+    std::cout << "Recovered ZYX: " << euler_zyx_recovered.transpose() << std::endl << std::endl;
 }
 
 void test_twist_func()
@@ -31,7 +31,7 @@ void test_twist_func()
     const Eigen::Vector3d v(15,7,0);
 
     std::cout << "Original v: " << v.transpose() << " | Original w: " << w.transpose() << std::endl;
-    std::cout << "New Twist Vector: " << robotics2::twist(w, v).transpose() << "\n" << std::endl;
+    std::cout << "New Twist Vector: " << robotics2::twist(w, v).transpose() << std::endl << std::endl;
 }
 
 void test_screw_func()
@@ -44,7 +44,7 @@ void test_screw_func()
 
     Eigen::VectorXd S = robotics2::screw_axis(q, s, h);
 
-    std::cout << "Screw axis S = " << S.transpose() << "\n" << std::endl;
+    std::cout << "Screw axis S = " << S.transpose() << std::endl << std::endl;
 }
 
 void test_adjoint_matrix()
@@ -59,7 +59,7 @@ void test_adjoint_matrix()
 
     Eigen::MatrixXd Adj = robotics2::adjoint_matrix(T);
 
-    std::cout << "AdjointMatrix: \n " << Adj << "\n" << std::endl;
+    std::cout << "AdjointMatrix: " << std::endl << Adj << std::endl << std::endl;
 }
 
 // Could make test functions for further functions in task 3, however have not done it. I trust my code... famous last words

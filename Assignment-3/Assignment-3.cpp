@@ -266,7 +266,6 @@ namespace robotics3 {
             thetas = thetas + gamma * (Jb_pinv * Vb);
             // Keep angles between -pi and pi
             for(int k = 0; k < thetas.size(); k++) thetas[k] = std::atan2(std::sin(thetas[k]), std::cos(thetas[k]));
-
         }
 
         return {iter, thetas};
